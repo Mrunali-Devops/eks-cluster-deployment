@@ -12,8 +12,8 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                git 'https://github.com/Mrunali-Devops/eks-cluster-deployment.git'
+            
+               git branch: 'main', url: 'https://github.com/Mrunali-Devops/eks-cluster-deployment.git'
             }
         }
     

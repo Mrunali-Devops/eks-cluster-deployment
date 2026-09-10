@@ -12,6 +12,10 @@ resource "aws_eks_cluster" "project-cluster" {
   vpc_config {
     subnet_ids = data.aws_subnets.available-subnets.ids
   }
+access_config {
+    authentication_mode = "API_AND_CONFIG_MAP"           #for authentication
+  }
+
 
   # Ensure that IAM Role permissions are created before and deleted after EKS Cluster handling.
   # Otherwise, EKS will not be able to properly delete EKS managed EC2 infrastructure such as Security Groups.
@@ -54,3 +58,22 @@ resource "aws_eks_node_group" "node-grp" {
     aws_iam_role_policy_attachment.AmazonEC2ContainerRegistryReadOnly
     ]  
 }
+
+#registers your AWS root account as a known identity
+
+resource "aws_eks_access_entry" "root_admin" {
+  cluster_name  = aws_eks_cluster.project-cluster.name
+  principal_arn = "arn:aws:iam::491799436001:root"
+}
+
+resource "aws_eks_access_policy_association" "root_admin_policy" {
+  cluster_name  = aws_eks_cluster.project-cluster.name
+  principal_arn = aws_eks_access_entry.root_admin.principal_arn
+  policy_arn    = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+
+  access_scope {
+    type = "cluster"
+  }
+}
+
+
